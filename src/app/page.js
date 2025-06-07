@@ -1,6 +1,7 @@
 'use client';
 
 import { yupResolver } from '@hookform/resolvers/yup';
+import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import * as yup from 'yup';
 import './DIYPortfolioForm.css';
@@ -50,9 +51,34 @@ const DIYPortfolioForm = () => {
     },
   });
 
-  const onSubmit = (data) => {
-    console.log('Submitted data:', data);
-    // TODO: POST to Netlify function or your backend to save in DatoCMS
+  const [loading, setLoading] = useState(false);
+
+  const onSubmit = async (data) => {
+    try {
+      setLoading(true);
+      const response = await fetch('/api/createDatoCmsContent', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(data),
+      });
+
+      const result = await response.json();
+      console.log("🚀 ~ onSubmit ~ result:", result)
+
+      if (result.success) {
+        alert('✅ Portfolio created successfully!');
+      } else {
+        alert('⚠️ Something went wrong. Check console.');
+        console.error(result.error);
+      }
+    } catch (error) {
+      alert('❌ Error submitting form');
+      console.error('Submission error:', error);
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -109,7 +135,9 @@ const DIYPortfolioForm = () => {
           </div>
         </section>
 
-        <button type="submit" className="submit-button">🚀 Create My Portfolio</button>
+        <button type="submit" className="submit-button" disabled={loading}>
+          {loading ? '🚀 Creating Portfolio...' : '🚀 Create My Portfolio'}
+        </button>
       </form>
     </div>
   );

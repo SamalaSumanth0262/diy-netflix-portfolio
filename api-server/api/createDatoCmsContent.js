@@ -1,20 +1,36 @@
-const fetch = require('node-fetch');
-
-const DATOCMS_API_TOKEN = process.env.DATOCMS_API_TOKEN;
-const DATOCMS_API_URL = 'https://graphql.datocms.com/';
-const DATOCMS_ENV = process.env.DATOCMS_ENV || 'main';
-
-exports.handler = async (event) => {
-  if (event.httpMethod !== 'POST') {
-    return { statusCode: 405, body: 'Method Not Allowed' };
+export default async function handler(req, res) {
+  if (req.method !== 'POST') {
+    return res.status(405).json({ error: 'Method Not Allowed' });
   }
 
-  const data = JSON.parse(event.body);
-  const { userId, name, bio, profileImage, topPicks, skills, projects, email, linkedin, github } = data;
+  const {
+    userId,
+    name,
+    bio,
+    profileImage,
+    topPicks,
+    skills,
+    projects,
+    email,
+    linkedin,
+    github
+  } = req.body;
+
+const DATOCMS_API_TOKEN = process.env.ADMIN_KEY;
+  const DATOCMS_API_URL = 'https://graphql.datocms.com/';
 
   const mutation = `
-    mutation CreateProfile($data: CreateProfileInput!, $skills: [CreateSkillInput!], $projects: [CreateProjectInput!]) {
-      createProfile(data: $data) {
+    mutation CreateProfile {
+      createProfile(data: {
+        name: "${name}",
+        bio: "${bio}",
+        profileImage: "${profileImage}",
+        userId: "${userId}",
+        email: "${email}",
+        linkedin: "${linkedin}",
+        github: "${github}",
+        topPicks: ${JSON.stringify(topPicks)}
+      }) {
         id
         name
       }
@@ -33,19 +49,6 @@ exports.handler = async (event) => {
     }
   `;
 
-  const variables = {
-    data: {
-      name,
-      bio,
-      profileImage,
-      userId,
-      email,
-      linkedin,
-      github,
-      topPicks,
-    }
-  };
-
   try {
     const response = await fetch(DATOCMS_API_URL, {
       method: 'POST',
@@ -53,20 +56,9 @@ exports.handler = async (event) => {
         'Content-Type': 'application/json',
         Authorization: `Bearer ${DATOCMS_API_TOKEN}`,
       },
-      body: JSON.stringify({ query: mutation, variables }),
+      body: JSON.stringify({ query: mutation }),
     });
 
     const result = await response.json();
 
-    return {
-      statusCode: 200,
-      body: JSON.stringify({ success: true, result }),
-    };
-  } catch (error) {
-    console.error('DatoCMS error:', error);
-    return {
-      statusCode: 500,
-      body: JSON.stringify({ success: false, error: error.message }),
-    };
-  }
-};
+    return res.status(200).json({ success: true, result

@@ -1,103 +1,118 @@
-import Image from "next/image";
+'use client';
 
-export default function Home() {
+import { yupResolver } from '@hookform/resolvers/yup';
+import { useForm } from 'react-hook-form';
+import * as yup from 'yup';
+import './DIYPortfolioForm.css';
+
+const schema = yup.object().shape({
+  userId: yup.string().required(),
+  name: yup.string().required(),
+  bio: yup.string(),
+  profileImage: yup.string().url(),
+  topPicks: yup.array().of(yup.string()),
+  skills: yup.array().of(
+    yup.object().shape({
+      name: yup.string().required(),
+      iconUrl: yup.string().url().required(),
+    })
+  ),
+  projects: yup.array().of(
+    yup.object().shape({
+      title: yup.string().required(),
+      description: yup.string(),
+      imageUrl: yup.string().url(),
+    })
+  ),
+  email: yup.string().email(),
+  linkedin: yup.string().url(),
+  github: yup.string().url(),
+});
+
+const DIYPortfolioForm = () => {
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm({
+    resolver: yupResolver(schema),
+    defaultValues: {
+      userId: '',
+      name: '',
+      bio: '',
+      profileImage: '',
+      topPicks: Array(6).fill(''),
+      skills: [{ name: '', iconUrl: '' }],
+      projects: [{ title: '', description: '', imageUrl: '' }],
+      email: '',
+      linkedin: '',
+      github: '',
+    },
+  });
+
+  const onSubmit = (data) => {
+    console.log('Submitted data:', data);
+    // TODO: POST to Netlify function or your backend to save in DatoCMS
+  };
+
   return (
-    <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
-      <main className="flex flex-col gap-[32px] row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="list-inside list-decimal text-sm/6 text-center sm:text-left font-[family-name:var(--font-geist-mono)]">
-          <li className="mb-2 tracking-[-.01em]">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] px-1 py-0.5 rounded font-[family-name:var(--font-geist-mono)] font-semibold">
-              src/app/page.js
-            </code>
-            .
-          </li>
-          <li className="tracking-[-.01em]">
-            Save and see your changes instantly.
-          </li>
-        </ol>
+    <div className="form-container">
+      <form className="diy-form" onSubmit={handleSubmit(onSubmit)}>
+        <h2 className="form-title">🎬 Create Your Netflix-Inspired Portfolio</h2>
 
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:w-auto"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 w-full sm:w-auto md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
-        </div>
-      </main>
-      <footer className="row-start-3 flex gap-[24px] flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
+        <section className="form-section">
+          <h3>Basic Info</h3>
+          <div className="form-grid">
+            <input {...register('userId')} placeholder="Unique User ID" />
+            <input {...register('name')} placeholder="Full Name" />
+            <textarea {...register('bio')} placeholder="Short Bio" />
+            <input {...register('profileImage')} placeholder="Profile Image URL" />
+          </div>
+        </section>
+
+        <section className="form-section">
+          <h3>Top Picks</h3>
+          <div className="form-grid">
+            {[...Array(6)].map((_, index) => (
+              <input
+                key={index}
+                {...register(`topPicks.${index}`)}
+                placeholder={`Top Pick ${index + 1}`}
+              />
+            ))}
+          </div>
+        </section>
+
+        <section className="form-section">
+          <h3>Skills</h3>
+          <div className="form-grid">
+            <input {...register(`skills.0.name`)} placeholder="Skill Name" />
+            <input {...register(`skills.0.iconUrl`)} placeholder="Icon URL" />
+          </div>
+        </section>
+
+        <section className="form-section">
+          <h3>Projects</h3>
+          <div className="form-grid">
+            <input {...register(`projects.0.title`)} placeholder="Project Title" />
+            <textarea {...register(`projects.0.description`)} placeholder="Project Description" />
+            <input {...register(`projects.0.imageUrl`)} placeholder="Image URL" />
+          </div>
+        </section>
+
+        <section className="form-section">
+          <h3>Contact Info</h3>
+          <div className="form-grid">
+            <input {...register('email')} placeholder="Email" />
+            <input {...register('linkedin')} placeholder="LinkedIn URL" />
+            <input {...register('github')} placeholder="GitHub URL" />
+          </div>
+        </section>
+
+        <button type="submit" className="submit-button">🚀 Create My Portfolio</button>
+      </form>
     </div>
   );
-}
+};
+
+export default DIYPortfolioForm;

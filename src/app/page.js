@@ -1,10 +1,10 @@
-'use client';
+"use client";
 
-import { yupResolver } from '@hookform/resolvers/yup';
-import { useState } from 'react';
-import { useForm } from 'react-hook-form';
-import * as yup from 'yup';
-import './DIYPortfolioForm.css';
+import { yupResolver } from "@hookform/resolvers/yup";
+import { useState } from "react";
+import { useForm } from "react-hook-form";
+import * as yup from "yup";
+import "./DIYPortfolioForm.css";
 
 const schema = yup.object().shape({
   userId: yup.string().required(),
@@ -38,16 +38,16 @@ const DIYPortfolioForm = () => {
   } = useForm({
     resolver: yupResolver(schema),
     defaultValues: {
-      userId: '',
-      name: '',
-      bio: '',
-      profileImage: '',
-      topPicks: Array(6).fill(''),
-      skills: [{ name: '', iconUrl: '' }],
-      projects: [{ title: '', description: '', imageUrl: '' }],
-      email: '',
-      linkedin: '',
-      github: '',
+      userId: "",
+      name: "",
+      bio: "",
+      profileImage: "",
+      topPicks: Array(6).fill(""),
+      skills: [{ name: "", iconUrl: "" }],
+      projects: [{ title: "", description: "", imageUrl: "" }],
+      email: "",
+      linkedin: "",
+      github: "",
     },
   });
 
@@ -56,26 +56,27 @@ const DIYPortfolioForm = () => {
   const onSubmit = async (data) => {
     try {
       setLoading(true);
-      const response = await fetch('/api/createDatoCmsContent', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(data),
-      });
+      const response = await fetch(
+        "https://diy-netflix-portfolio-backend.vercel.app/api/createDatoCmsContent",
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(data),
+        }
+      );
 
       const result = await response.json();
-      console.log("🚀 ~ onSubmit ~ result:", result)
+      console.log("🚀 ~ onSubmit ~ result:", result);
 
       if (result.success) {
-        alert('✅ Portfolio created successfully!');
+        alert("✅ Portfolio created successfully!");
       } else {
-        alert('⚠️ Something went wrong. Check console.');
+        alert("⚠️ Something went wrong. Check console.");
         console.error(result.error);
       }
     } catch (error) {
-      alert('❌ Error submitting form');
-      console.error('Submission error:', error);
+      alert("❌ Error submitting form");
+      console.error("Submission error:", error);
     } finally {
       setLoading(false);
     }
@@ -84,15 +85,20 @@ const DIYPortfolioForm = () => {
   return (
     <div className="form-container">
       <form className="diy-form" onSubmit={handleSubmit(onSubmit)}>
-        <h2 className="form-title">🎬 Create Your Netflix-Inspired Portfolio</h2>
+        <h2 className="form-title">
+          🎬 Create Your Netflix-Inspired Portfolio
+        </h2>
 
         <section className="form-section">
           <h3>Basic Info</h3>
           <div className="form-grid">
-            <input {...register('userId')} placeholder="Unique User ID" />
-            <input {...register('name')} placeholder="Full Name" />
-            <textarea {...register('bio')} placeholder="Short Bio" />
-            <input {...register('profileImage')} placeholder="Profile Image URL" />
+            <input {...register("userId")} placeholder="Unique User ID" />
+            <input {...register("name")} placeholder="Full Name" />
+            <textarea {...register("bio")} placeholder="Short Bio" />
+            <input
+              {...register("profileImage")}
+              placeholder="Profile Image URL"
+            />
           </div>
         </section>
 
@@ -120,23 +126,32 @@ const DIYPortfolioForm = () => {
         <section className="form-section">
           <h3>Projects</h3>
           <div className="form-grid">
-            <input {...register(`projects.0.title`)} placeholder="Project Title" />
-            <textarea {...register(`projects.0.description`)} placeholder="Project Description" />
-            <input {...register(`projects.0.imageUrl`)} placeholder="Image URL" />
+            <input
+              {...register(`projects.0.title`)}
+              placeholder="Project Title"
+            />
+            <textarea
+              {...register(`projects.0.description`)}
+              placeholder="Project Description"
+            />
+            <input
+              {...register(`projects.0.imageUrl`)}
+              placeholder="Image URL"
+            />
           </div>
         </section>
 
         <section className="form-section">
           <h3>Contact Info</h3>
           <div className="form-grid">
-            <input {...register('email')} placeholder="Email" />
-            <input {...register('linkedin')} placeholder="LinkedIn URL" />
-            <input {...register('github')} placeholder="GitHub URL" />
+            <input {...register("email")} placeholder="Email" />
+            <input {...register("linkedin")} placeholder="LinkedIn URL" />
+            <input {...register("github")} placeholder="GitHub URL" />
           </div>
         </section>
 
         <button type="submit" className="submit-button" disabled={loading}>
-          {loading ? '🚀 Creating Portfolio...' : '🚀 Create My Portfolio'}
+          {loading ? "🚀 Creating Portfolio..." : "🚀 Create My Portfolio"}
         </button>
       </form>
     </div>
